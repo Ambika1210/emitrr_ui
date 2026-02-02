@@ -3,8 +3,8 @@ import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { Trophy, User, LogOut, Send, Timer } from 'lucide-react';
 
-const SOCKET_URL = 'ws://localhost:8080/ws';
-const API_URL = 'http://localhost:8080';
+const SOCKET_URL = 'wss://emitrr-backend-kgt9.onrender.com/ws';
+const API_URL = 'https://emitrr-backend-kgt9.onrender.com';
 
 export default function App() {
   const [username, setUsername] = useState('');
@@ -33,9 +33,9 @@ export default function App() {
 
   const joinGame = () => {
     if (!username.trim()) return;
-    
+
     const ws = new WebSocket(`${SOCKET_URL}?username=${username}`);
-    
+
     ws.onopen = () => {
       setIsJoined(true);
       setStatus('Waiting');
@@ -79,7 +79,7 @@ export default function App() {
 
   const makeMove = (col) => {
     if (status !== 'Playing' || !socketRef.current) return;
-    
+
     const moveMsg = {
       type: 'MOVE',
       payload: {
@@ -97,9 +97,9 @@ export default function App() {
           <h1>4 in a Row</h1>
           <p style={{ color: 'var(--text-muted)' }}>Real-time multiplayer strategic game</p>
           <div className="input-group">
-            <input 
-              type="text" 
-              placeholder="Enter your username..." 
+            <input
+              type="text"
+              placeholder="Enter your username..."
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && joinGame()}
@@ -107,7 +107,7 @@ export default function App() {
             <button onClick={joinGame}>Join Arena</button>
           </div>
         </div>
-        
+
         <Leaderboard data={leaderboard} />
       </div>
     );
@@ -122,17 +122,17 @@ export default function App() {
           <span style={{ color: 'var(--text-muted)' }}>vs</span>
           <span style={{ fontWeight: 600 }}>{opponent || '...'}</span>
         </div>
-        
+
         {status === 'Playing' && (
           <div className={`turn-indicator ${gameState?.currentPlayer === 1 ? 'turn-red' : 'turn-yellow'}`}>
             {gameState?.currentPlayer === 1 ? "Red's Turn" : "Yellow's Turn"}
           </div>
         )}
-        
+
         {status === 'Waiting' && <span>Finding Opponent...</span>}
-        
-        <button className="logout-btn" onClick={() => socketRef.current?.close()} 
-                style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--glass-border)' }}>
+
+        <button className="logout-btn" onClick={() => socketRef.current?.close()}
+          style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--glass-border)' }}>
           <LogOut size={18} />
         </button>
       </div>
@@ -149,10 +149,10 @@ export default function App() {
 
           {gameState && (
             <div className="board">
-              {gameState.board.map((row, rIdx) => 
+              {gameState.board.map((row, rIdx) =>
                 row.map((cell, cIdx) => (
-                  <div 
-                    key={`${rIdx}-${cIdx}`} 
+                  <div
+                    key={`${rIdx}-${cIdx}`}
                     className={`cell ${cell === 1 ? 'player-1' : cell === 2 ? 'player-2' : ''}`}
                     onClick={() => makeMove(cIdx)}
                   ></div>
@@ -164,8 +164,8 @@ export default function App() {
           {status === 'Finished' && (
             <div className="card" style={{ marginTop: '2rem' }}>
               <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
-                {gameState.isDraw ? "It's a Draw! 🤝" : 
-                 gameState.winner === 1 ? "Red Wins! 🎉" : "Yellow Wins! 🥳"}
+                {gameState.isDraw ? "It's a Draw! 🤝" :
+                  gameState.winner === 1 ? "Red Wins! 🎉" : "Yellow Wins! 🥳"}
               </h2>
               <button onClick={() => window.location.reload()}>Play Again</button>
             </div>
